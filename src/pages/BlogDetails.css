@@ -1,0 +1,109 @@
+.loading,
+.error {
+  text-align: center;
+  margin-top: 2rem;
+  color: var(--color-slate-500);
+}
+
+.error button {
+  margin-top: 1rem;
+  background-color: var(--color-teal-500);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: var(--color-teal-500);
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.post-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--color-charcoal-800);
+}
+
+.post-image-wrapper {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.post-image {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.post-content {
+  line-height: 1.6;
+  color: var(--color-slate-700);
+}
+
+.blog-page h1 {
+  margin-bottom: 1.5rem;
+  color: var(--color-charcoal-800);
+}
+
+.filters {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.filters label {
+  font-size: 0.9rem;
+  color: var(--color-slate-700);
+  display: flex;
+  flex-direction: column;
+}
+
+.filters input {
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-gray-300);
+  border-radius: 4px;
+  width: 100%;
+  max-width: 300px;
+}
+
+/* Responsive row layout for filters on tablets */
+@media (min-width: 768px) {
+  .filters {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+  }
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+/* 2 columns on tablets */
+@media (min-width: 600px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 3 columns on desktops */
+@media (min-width: 1025px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

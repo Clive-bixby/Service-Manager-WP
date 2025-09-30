@@ -1,0 +1,50 @@
+.services-page h1 {
+  margin-bottom: 1.5rem;
+  color: var(--color-charcoal-800);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.filters label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  color: var(--color-slate-700);
+  min-width: 200px;
+  flex: 1 1 280px;
+}
+
+.filters select,
+.filters input {
+  margin-top: 0.25rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-gray-300);
+  border-radius: 4px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+/* 2 columns on tablets */
+@media (min-width: 600px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 3 columns on desktops */
+@media (min-width: 1025px) {
+  .cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

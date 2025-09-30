@@ -25,7 +25,7 @@ function normalizeWPService(item) {
   };
 }
 
-
+// Replace your existing useEffect with this:
 useEffect(() => {
   const base = import.meta.env.VITE_WP_API_URL;
   const wpURL = base ? `${base}/services?_embed` : null;
@@ -35,7 +35,10 @@ useEffect(() => {
     .then(res => res.json())
     .then(data => {
       const items = Array.isArray(data)
-        ? (base ? data.map(normalizeWPService) : data)
+        ? (base ? data.map(normalizeWPService) : data.map(item => ({
+            ...item,
+            priceValue: Number(item.price.replace(/[₹,]/g, ''))
+          })))
         : [];
       setServices(items);
     })
@@ -44,7 +47,13 @@ useEffect(() => {
       if (base) {
         fetch('/services.json')
           .then(res => res.json())
-          .then(data => setServices(data))
+          .then(data => {
+            const normalized = data.map(item => ({
+              ...item,
+              priceValue: Number(item.price.replace(/[₹,]/g, ''))
+            }));
+            setServices(normalized);
+          })
           .catch(console.error);
       }
     });

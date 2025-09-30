@@ -773,6 +773,9 @@ body {
   max-width: var(--container-xl);
   margin: 0 auto;
   gap: var(--space-32);
+  /* Mobile-first: stack and center */
+  flex-direction: column;
+  text-align: center;
 }
 
 .hero-content {
@@ -781,7 +784,7 @@ body {
 }
 
 .hero-title {
-  font-size: var(--font-size-4xl);
+  font-size: clamp(1.75rem, 2.2vw + 1rem, 2.5rem);
   font-weight: var(--font-weight-bold);
   margin-bottom: var(--space-16);
   line-height: var(--line-height-tight);
@@ -789,10 +792,13 @@ body {
 }
 
 .hero-tagline {
-  font-size: var(--font-size-xl);
+  font-size: clamp(1rem, 1vw + 0.8rem, 1.25rem);
   margin-bottom: var(--space-32);
   opacity: 0.9;
   line-height: var(--line-height-normal);
+  max-width: 65ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hero-buttons {
@@ -884,7 +890,7 @@ body {
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: var(--space-32);
   max-width: var(--container-lg);
   margin: 0 auto;
@@ -953,7 +959,7 @@ body {
 }
 @media (max-width: 480px) {
   .container {
-    padding: 0 var(--space-12);
+    padding: 0 var(--space-16);
   }
   .hero {
     padding: var(--space-20) var(--space-12);
@@ -1018,5 +1024,159 @@ body {
 @media (min-width: 1025px) {
   .cards-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Accessible, responsive navbar (mobile-first) */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-card-border);
+}
+[data-color-scheme="dark"] .navbar {
+  border-bottom-color: var(--color-card-border);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  height: 64px;
+  max-width: var(--container-xl);
+  margin: 0 auto;
+  padding: 0 var(--space-16);
+}
+.nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-8);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.nav-brand:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+/* Hamburger button (visible on small screens) */
+.nav-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-base);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+.nav-toggle:hover {
+  background-color: var(--color-secondary);
+}
+.nav-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Links container: hidden by default on mobile */
+.nav-links {
+  display: none;
+  position: absolute;
+  inset: 64px var(--space-16) auto var(--space-16); /* dropdown under bar */
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-16);
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/* Open state via data-attr on navbar or utility class on links */
+.navbar[data-open="true"] .nav-links,
+.nav-links.is-open {
+  display: flex;
+}
+.nav-links a {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-8) var(--space-12);
+  border-radius: var(--radius-base);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+.nav-links a:hover {
+  background-color: var(--color-secondary);
+}
+.nav-links a:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Desktop/tablet layout for navbar */
+@media (min-width: 768px) {
+  .nav-toggle {
+    display: none;
+  }
+  .nav-links {
+    position: static;
+    display: flex !important; /* ensure visible on larger screens */
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-16);
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    background: transparent;
+  }
+  .nav-links a:hover {
+    background-color: transparent;
+    color: var(--color-primary);
+  }
+}
+
+/* Improved touch targets for buttons and links */
+.btn,
+.nav-links a,
+.nav-toggle {
+  min-height: 40px;
+}
+
+/* Small polish: ensure hero media doesn't overflow */
+.hero-image {
+  max-width: 100%;
+}
+.hero-image img,
+.hero-image svg,
+.hero-image canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Optional: safe-area insets for notched devices */
+@supports (padding: max(0px)) {
+  .navbar .nav-inner {
+    padding-left: max(var(--space-16), env(safe-area-inset-left));
+    padding-right: max(var(--space-16), env(safe-area-inset-right));
   }
 }

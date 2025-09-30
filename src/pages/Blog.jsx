@@ -7,23 +7,43 @@ const Blog = () => {
   const [posts, setPosts] = useState([])
   const [filters, setFilters] = useState({ category: '', tag: '' })
 
-  useEffect(() => {
-    fetch('https://service-manager-wp.local/wp-json/wp/v2/posts?_embed')
-      .then(res => res.json())
-      .then(data => {
-        const normalized = data.map(item => ({
-          id: item.id,
-          title: item.title.rendered,
-          excerpt: item.excerpt.rendered.replace(/<[^>]*>/g, ''),
-          content: item.content.rendered,
-          image:
-            item._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
-            '/placeholder.jpg'
-        }))
-        setPosts(normalized)
-      })
-      .catch(console.error)
-  }, [])
+  // Helper to normalize WordPress blog post
+function normalizeWPPost(item) {
+  return {
+    id: item.id,
+    title: item.title.rendered,
+    excerpt: item.excerpt.rendered.replace(/<[^>]*>/g, ''),
+    content: item.content.rendered,
+    image:
+      item._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
+      '/placeholder.jpg'
+  };
+}
+
+useEffect(() => {
+  const base = import.meta.env.VITE_WP_API_URL;
+  const wpURL = base ? `${base}/posts?_embed` : null;
+  const fetchURL = wpURL || '/blogs.json';
+
+  fetch(fetchURL)
+    .then(res => res.json())
+    .then(data => {
+      const items = Array.isArray(data)
+        ? (base ? data.map(normalizeWPPost) : data)
+        : [];
+      setPosts(items);
+    })
+    .catch(err => {
+      console.error('Fetch failed, loading local JSON:', err);
+      if (base) {
+        fetch('/blogs.json')
+          .then(res => res.json())
+          .then(data => setPosts(data))
+          .catch(console.error);
+      }
+    });
+}, []);
+
 
 
   // Derive categories and tags safely (if fields exist)

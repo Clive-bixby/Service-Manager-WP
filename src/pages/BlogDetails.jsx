@@ -8,24 +8,54 @@ const BlogDetails = () => {
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-  fetch(
-    `https://service-manager-wp.local/wp-json/wp/v2/posts/${id}?_embed`
-  )
-    .then(res => res.json())
-    .then(data => {
-      setPost({
-        id: data.id,
-        title: data.title.rendered,
-        content: data.content.rendered,
-        image:
-          data._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
-          '/placeholder.jpg'
+  // Helper to normalize WordPress single post
+function normalizeWPPost(data) {
+  return {
+    id: data.id,
+    title: data.title.rendered,
+    content: data.content.rendered,
+    image:
+      data._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
+      '/placeholder.jpg'
+  };
+}
+
+useEffect(() => {
+  const base = import.meta.env.VITE_WP_API_URL;
+  const wpURL = base ? `${base}/posts/${id}?_embed` : null;
+
+  if (wpURL) {
+    // Try WordPress API first
+    fetch(wpURL)
+      .then(res => res.json())
+      .then(data => {
+        setPost(normalizeWPPost(data));
       })
-    })
-    .catch(console.error)
-    .finally(() => setLoading(false))
-}, [id])
+      .catch(err => {
+        console.error('WordPress API failed, trying local JSON:', err);
+        // Fallback to local JSON
+        fetch('/blogs.json')
+          .then(res => res.json())
+          .then(data => {
+            const found = data.find(p => p.id.toString() === id);
+            setPost(found);
+          })
+          .catch(console.error);
+      })
+      .finally(() => setLoading(false));
+  } else {
+    // Production: use local JSON directly
+    fetch('/blogs.json')
+      .then(res => res.json())
+      .then(data => {
+        const found = data.find(p => p.id.toString() === id);
+        setPost(found);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }
+}, [id]);
+
 
 
   if (loading) {

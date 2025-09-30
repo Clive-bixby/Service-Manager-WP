@@ -10,25 +10,46 @@ const Services = () => {
     search: ''
   })
 
-  useEffect(() => {
-  fetch('https://service-manager-wp.local/wp-json/wp/v2/services?_embed')
+// Helper to normalize WordPress service item
+function normalizeWPService(item) {
+  return {
+    id: item.id,
+    title: item.title.rendered,
+    description: item.content.rendered.replace(/<[^>]*>/g, ''),
+    price: item.acf?.price || '₹0',
+    priceValue: Number((item.acf?.price || '0').replace(/[₹,]/g, '')),
+    category: item.acf?.category || 'Uncategorized',
+    image:
+      item._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
+      '/placeholder.jpg'
+  };
+}
+
+
+useEffect(() => {
+  const base = import.meta.env.VITE_WP_API_URL;
+  const wpURL = base ? `${base}/services?_embed` : null;
+  const fetchURL = wpURL || '/services.json';
+
+  fetch(fetchURL)
     .then(res => res.json())
     .then(data => {
-      const normalized = data.map(item => ({
-        id: item.id,
-        title: item.title.rendered,
-        description: item.content.rendered.replace(/<[^>]*>/g, ''),
-        price: item.acf?.price || '₹0',
-        priceValue: Number((item.acf?.price || '0').replace(/[₹,]/g, '')),
-        category: item.acf?.category || 'Uncategorized',
-        image:
-          item._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
-          '/placeholder.jpg'
-      }))
-      setServices(normalized)
+      const items = Array.isArray(data)
+        ? (base ? data.map(normalizeWPService) : data)
+        : [];
+      setServices(items);
     })
-    .catch(console.error)
-}, [])
+    .catch(err => {
+      console.error('Fetch failed, loading local JSON:', err);
+      if (base) {
+        fetch('/services.json')
+          .then(res => res.json())
+          .then(data => setServices(data))
+          .catch(console.error);
+      }
+    });
+}, []);
+
 
 
   const filtered = services.filter(item => {
